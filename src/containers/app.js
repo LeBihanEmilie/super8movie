@@ -9,7 +9,8 @@ import axios from 'axios';
 const API_END_POINT = "https://api.themoviedb.org/3/";
 const POPULAR_MOVIES_URL = "discover/movie?language=fr&sort_by=popularity.desc&include_adult=false&api_key=3f5c8457b6718679cbf70c4b1ea4491d"
 const API_KEY = "3f5c8457b6718679cbf70c4b1ea4491d"
-const SEARCH_URL = "search/movie?language=fr&include_adult=false²"
+const SEARCH_URL = "search/movie?language=fr&include_adult=false"
+
 
 // Quand la classe va être crée , elle va rentrer dans le constructor, créer dans son state à vide.Et rentrer dans le componentdidmount
 
@@ -19,7 +20,8 @@ class App extends Component {
     this.state={
       movieList:{},
       //movieList contient les filmes les plus populaires
-      currentMovie:{}
+      currentMovie:{},
+      isSearch: false,
     }
     //ce state correspond à l'ensemble des films qui seront dans ma page
   }
@@ -38,26 +40,27 @@ class App extends Component {
     );
   }
 
-  receiveCallBack(movie){
-    this.setState({currentMovie: movie},function(){
+
+  onClickListItem(movie){
+    this.setState({currentMovie: movie}, function(){
       this.applyVideoToCurrentMovie();
-    })
+      this.setRecommendation();
+    });
   }
 
   applyVideoToCurrentMovie(){
      axios.get(`${API_END_POINT}movie/${this.state.currentMovie.id}?${API_KEY}&append_to_response=videos&include_adult=false`)
-  .then(function(response){
+    .then(function(response){
     const youtube_Key = response.data.videos.results[0].key;
     let newCurrentMovieState = this.state.currentMovie;
     newCurrentMovieState.videoId = youtube_Key;
     this.setState({currentMovie: newCurrentMovieState})
-    console.log(newCurrentMovieState)
       }.bind(this)
     );
   }
 
   setRecommendation(){
-    axios.get(`${API_END_POINT}movie?${this.state.currentMovie.id}/recommendations?${API_KEY}&language=fr`)
+    axios.get(`${API_END_POINT}movie/${this.state.currentMovie.id}/recommendations?${API_KEY}&language=fr`)
     .then(function(response){
       //qd on récupère des films on met à jour notre state.
       this.setState({movieList: response.data.results.slice(0,5)})
@@ -65,33 +68,20 @@ class App extends Component {
   }
 
 
-  onClickListItem(movie){
-    this.setState({currentMovie: movie}, function(){
-      this.applyVideoToCurrentMovie();
-      this.setRecommendation();
-    })
-  }
-
   onClickSearch(searchText){
-    //on vérifie que du texte est envoyé, avanrt de commencer à faire un requête
     if(searchText){
       axios.get(`${API_END_POINT}${SEARCH_URL}&${API_KEY}&query=${searchText}`)
       .then(function(response){
-        //puis on vérifie qu'on a bien une réponse
-    if(response.data && response.data.results[0]){
-      //Si ce film a déjà été recherché, pas besoin de lancer une nvelle recherche
-      // on vérifie que le résultat que l'on recoit est bien différent du nouveau film que l'on recoit, dc ici on compare les id de films.
-      // l'id du currentMovie doit etre différente de la recherche
-      if(response.data.results[0].id != this.state.currentMovie.id){
-        //une fois que le résultat nous convient
-        //ici on a une fonction abnonyme en callback, pour etre sur
-        this.setState({currentMovie: response.data.results[0]},() => {
-          this.applyVideoToCurrentMovie();
-          this.setRecommendation();
-        })}
-      }})
+        if(response.data && response.data.results[0]){
+          if(response.data.results[0].id != this.state.currentMovie.id){
+            this.setState({currentMovie: response.data.results[0]}, () => {
+              this.applyVideoToCurrentMovie();
+              this.setRecommendation();
+            })
+          }}
+      }.bind(this))
     }}
-
+    
 
   render() {
     const renderVideoList = () => {

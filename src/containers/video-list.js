@@ -4,6 +4,10 @@ import VideoListItem from '../components/video-list-item';
 const VideoList = (props) => {
     const{movieList} = props;
 
+    function onClickListItem(movie){
+        props.callback(movie)
+    }  
+
     return(
         <div>
             <ul>
@@ -11,18 +15,16 @@ const VideoList = (props) => {
                 On va envoyé comme paramètre le nom de chaque titre de movie.
                  on dit pour chaque movie, tu nous retournes : 1 viddeoListItem, et movie */}
                 {movieList.map(movie => {
-                  return <VideoListItem key={movie.id} movie={movie} callback={receiveCallBack}/>
+                  return <VideoListItem key={movie.id} movie={movie} callback={onClickListItem}/>
                   }
                 )
                 }
             </ul>
         </div>
     );
-    function receiveCallBack (movie){
-        props.callback(movie)
-    }  
+  
 }
 
 export default VideoList;
 
-// chaque videoListItem va recevoir dans sses props un iem
+// chaque videoListItem va recevoir dans ses props un iem
