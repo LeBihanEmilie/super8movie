@@ -8,7 +8,7 @@ import axios from 'axios';
 
 const API_END_POINT = "https://api.themoviedb.org/3/";
 const POPULAR_MOVIES_URL = "discover/movie?language=fr&sort_by=popularity.desc&include_adult=false&api_key=3f5c8457b6718679cbf70c4b1ea4491d"
-const API_KEY = "3f5c8457b6718679cbf70c4b1ea4491d"
+const API_KEY = "api_key=3f5c8457b6718679cbf70c4b1ea4491d"
 const SEARCH_URL = "search/movie?language=fr&include_adult=false"
 
 
@@ -19,7 +19,7 @@ class App extends Component {
     super(props);
     this.state={
       movieList:{},
-      //movieList contient les filmes les plus populaires
+      //movieList contient les films les plus populaires
       currentMovie:{},
       isSearch: false,
     }
